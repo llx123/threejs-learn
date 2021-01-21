@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>chapter01-Three.js创建第一个三维场景</title>
+  <script src="../js/three.js"></script>
+  <script src="../js/Stats.js"></script>
+  <script src="../js/dat.gui.js"></script>
+  <script src="../js/TrackballControls.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    console.log(THREE.REVISION);
+    window.addEventListener('resize', onResize, false);
+
+    let scene, camera, renderer;
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000)
+    renderer = new THREE.WebGLRenderer();
+    renderer.setClearColor(0x000000);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+
+    let plane, cube, sphere, spotLight;
+    // axes
+    // 添加轴线
+    // axes = new THREE.AxesHelper(20);
+    // scene.add(axes);
+
+    let planeGeometry, planeMateria;
+    planeGeometry = new THREE.PlaneGeometry(60,20);
+    planeMateria = new THREE.MeshLambertMaterial({
+      color: 0xFFFFFF
+    });
+    plane = new THREE.Mesh(planeGeometry, planeMateria);
+    plane.rotation.x = -0.5 * Math.PI;
+    plane.position.set(15,0,0);
+    plane.receiveShadow = true;
+    scene.add(plane);
+
+    let cubeGeometry, cubeMaterial;
+    cubeGeometry = new THREE.BoxGeometry(4,4,4);
+    cubeMaterial = new THREE.MeshLambertMaterial({
+      color: 0xFF0000,
+      // wireframe: true
+    });
+    cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube.position.set(-4, 4, 0);
+    cube.castShadow = true;
+    scene.add(cube);
+
+    let sphereGeometry, sphereMaterial;
+    sphereGeometry = new THREE.SphereGeometry(4,20,20);
+    sphereMaterial = new THREE.MeshLambertMaterial({
+      color: 0x7777FF,
+      // wireframe: true
+    });
+    sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    sphere.position.set(20,4,2);
+    sphere.castShadow = true;
+    scene.add(sphere);
+
+    // 添加聚光灯、阴影
+    spotLight = new THREE.SpotLight(0xFFFFFF)
+    spotLight.position.set(-40, 40, -15);
+    spotLight.castShadow = true;
+    spotLight.shadow.mapSize = new THREE.Vector2(1024, 1024);
+    spotLight.shadow.camera.far = 130;
+    spotLight.shadow.camera.near = 40;
+    scene.add(spotLight);
+
+    let ambienLight = new THREE.AmbientLight(0x353535);
+    scene.add(ambienLight);
+
+    camera.position.set(-30, 40, 30);
+    camera.lookAt(scene.position);
+
+    document.body.appendChild(renderer.domElement);
+    renderer.render(scene, camera);
+
+    let step = 0,
+    controls = new function () {
+        this.rotationSpeed = 0.02;
+        this.bouncingSpeed = 0.03;
+    };
+
+    let gui = new dat.GUI();
+    gui.add(controls, 'rotationSpeed', 0, 0.5);
+    gui.add(controls, 'bouncingSpeed', 0, 0.5);
+
+    function initStats(type) {
+      var panelType = (typeof type !== 'undefined' && type) && (!isNaN(type)) ? parseInt(type) : 0;
+      var stats = new Stats();
+
+      stats.showPanel(panelType); // 0: fps, 1: ms, 2: mb, 3+: custom
+      document.body.appendChild(stats.dom);
+
+      return stats;
+    }
+    function initTrackballControls(camera, renderer) {
+    var trackballControls = new THREE.TrackballControls(camera, renderer.domElement);
+      trackballControls.rotateSpeed = 1.0;
+      trackballControls.zoomSpeed = 1.2;
+      trackballControls.panSpeed = 0.8;
+      trackballControls.noZoom = false;
+      trackballControls.noPan = false;
+      trackballControls.staticMoving = true;
+      trackballControls.dynamicDampingFactor = 0.3;
+      trackballControls.keys = [65, 83, 68];
+
+      return trackballControls;
+    }
+    let stats = initStats();
+    let trackballControls = initTrackballControls(camera, renderer);
+    let clock = new THREE.Clock();
+
+    
+    renderScene();
+    function renderScene() {
+      trackballControls.update(clock.getDelta());
+      stats.update();
+
+      cube.rotation.x += controls.rotationSpeed;
+      cube.rotation.y += controls.rotationSpeed;
+      cube.rotation.z += controls.rotationSpeed;
+
+      step += controls.bouncingSpeed;
+      sphere.position.x = 20 + (10 * (Math.cos(step)));
+      sphere.position.y = 2 + (10 * Math.abs(Math.sin(step)));
+
+      requestAnimationFrame(renderScene);
+      renderer.render(scene, camera);
+    }    
+
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }  
+  </script>
+  
+  <script src="../js/TrackballControls.js"></script>
+</body>
+
+</html>
