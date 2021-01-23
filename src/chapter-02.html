@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chapter02-构建Three.js基本组件</title>
+    <script src="../js/three.js"></script>
+    <script src="../js/Stats.js"></script>
+    <script src="../js/dat.gui.js"></script>
+    <script src="../js/TrackballControls.js"></script>
+    <script src="../js/util.js"></script>
+</head>
+<body>
+  
+<script>
+  let stats = initStats(),
+  scene = new THREE.Scene(),
+  camera = new THREE.Camera(),
+  renderer = new THREE.WebGLRenderer();
+  renderer.setClearColor(0x000000);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+
+  let planeGeometry = new THREE.PlaneGeometry(60, 40, 1, 1);
+  let planeMaterial = new THREE.MeshLambertMaterial({
+    color: 0xffffff
+  })
+  let plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane.receiveShadow = true;
+  plane.rotation.x = - 0.5 * Math.PI;
+  plane.position.set(0,0,0);
+
+  scene.add(plane);
+  camera.position.set(-30, 40, 30);
+  camera.lookAt(scene.position);
+  // 添加环境光
+  let ambientLight = new THREE.AmbientLight(0x3c3c3c);
+  scene.add(ambientLight);
+  // 聚光灯
+  let spotLight = new THREE.SpotLight(0xffffff, 1.2, 150, 120);
+  spotLight.position.set(-40, 60, -10);
+  spotLight.castShadow = true;
+  scene.add(spotLight);
+
+
+  let controls = new function() {
+    this.rotationSpeed = 0.02;
+    this.numberOfObjects = scene.children.length;
+
+    this.remove
+  }
+
+</script>
+</body>
+</html>
